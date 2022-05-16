@@ -1,3 +1,4 @@
+lib/credential.dart
 # Miscellaneous
 *.class
 *.log
