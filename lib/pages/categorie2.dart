@@ -11,11 +11,34 @@ class Categorie2Page extends StatefulWidget {
 }
 
 class _PageState extends State<Categorie2Page> {
+  //String sqlBrowse = 'SELECT * FROM categorie2 LEFT JOIN categorie ON categorie2.idcategoria=categorie.id';
   String sqlBrowse = 'SELECT * FROM categorie2';
   String sqlDelete = 'DELETE FROM categorie2 WHERE id=?';
   String sqlInsert =
       'INSERT INTO CATEGORIE2 (DESCRIZIONE,ANNO,NOTE) VALUES(?,?,?)';
   String sqlEdit = 'UPDATE CATEGORIE2 SET DESCRIZIONE=?,ANNO=?,NOTE=? WHERE ID=';
+
+
+CREATE TABLE categorie2 (
+    id           INTEGER NOT NULL
+                         PRIMARY KEY,
+    idcategoria  INTEGER NOT NULL,
+    descrizione  TEXT    NOT NULL,
+    anno1        INTEGER NOT NULL,
+    anno2        INTEGER NOT NULL,
+    kata         INTEGER NOT NULL,
+    kumite       INTEGER NOT NULL,
+    pesoiniziale INTEGER NOT NULL,
+    pesofinale   INTEGER NOT NULL,
+    cinturada    INTEGER NOT NULL,
+    cinturaa     INTEGER NOT NULL,
+    sesso        TEXT    NOT NULL,
+    note         TEXT    NOT NULL
+);
+
+
+
+
   String routeBase = '/categorie2';
 //  List<String> browseFields = ['id', 'descrizione', 'anno', 'note'];
 //  List<int> browseFieldsSize = [100, 100, 100, 100, 100];

@@ -21,7 +21,7 @@ class _PageState extends State<CategoriePage> {
 //  List<String> browseFields = ['id', 'descrizione', 'anno', 'note'];
 //  List<int> browseFieldsSize = [100, 100, 100, 100, 100];
 //  List<String> browseCaption = ['ID', 'DESCRIZIONE', 'ANNO', 'NOTE'];
-  List<String> browseDelete = ['descrizione', 'anno', 'note'];
+  List<String> browseDelete = ['descrizione', 'note'];
 //  int selectedIndex = 2;
 
   @override
@@ -40,7 +40,7 @@ class _PageState extends State<CategoriePage> {
       // ss contiene la scritta per il delete
       String ss = '';
       for (String sss in browseDelete) {
-        ss = ss + row[sss].toString() + ' ';
+        ss = '$ss   ${row[sss]}';
       }
 
       ListTile l = ListTile(
@@ -64,10 +64,7 @@ class _PageState extends State<CategoriePage> {
           ),
         ),
         title: Text(
-          'ID:   ' +
-              row['id'].toString() +
-              '     Descrizione:  ' +
-              row['descrizione'].toString(),
+          'ID:   ${row['id'].toString()}     Descrizione:  ${row['descrizione'].toString()}',
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
@@ -77,10 +74,7 @@ class _PageState extends State<CategoriePage> {
           children: <Widget>[
             //Icon(Icons.delete, color: Colors.yellowAccent),
             Text(
-                'Anno:   ' +
-                    row['anno'].toString() +
-                    '     Note:   ' +
-                    row['note'].toString(),
+                'Anno:   ${row['anno'].toString()}     Note:   ${row['note'].toString()}',
                 style: const TextStyle(color: Colors.white))
           ],
         ),
@@ -90,8 +84,9 @@ class _PageState extends State<CategoriePage> {
             color: Colors.green,
             onPressed: () {
               categorie2id = row['id'].toString();
-              categorie2title= row['descrizione'].toString()+' / '+row['note'].toString();
-              print(categorie2id);
+              categorie2title =
+                  '${row['descrizione'].toString()} / ${row['note'].toString()}';
+              //print(categorie2id);
               Navigator.pushNamedAndRemoveUntil(
                   context, '/categorie2', (route) => false);
             }),
@@ -113,29 +108,29 @@ class _PageState extends State<CategoriePage> {
     return rows;
   }
 
-  void edit(String id) {
-    final TextEditingController _id = TextEditingController();
-    final TextEditingController _descrizione = TextEditingController();
-    final TextEditingController _anno = TextEditingController();
-    final TextEditingController _note = TextEditingController();
+  void edit(String ids) {
+    final TextEditingController id = TextEditingController();
+    final TextEditingController descrizione = TextEditingController();
+    final TextEditingController anno = TextEditingController();
+    final TextEditingController note = TextEditingController();
 
     var titolo = 'Errore nel recupero dei dati';
-    if (id == '-1') {
+    if (ids == '-1') {
       titolo = 'Nuova categoria';
-      _id.text = '-1';
-      _descrizione.text = '';
-      _anno.text = '';
-      _note.text = '';
+      id.text = '-1';
+      descrizione.text = '';
+      anno.text = '';
+      note.text = '';
     } else {
       titolo = 'Modifica Categoria';
       openConnection();
       final sql.ResultSet res =
           db.select('SELECT * FROM CATEGORIE WHERE ID= ?', [id]);
       for (final sql.Row row in res) {
-        _id.text = row['id'].toString();
-        _descrizione.text = row['descrizione'].toString();
-        _anno.text = row['anno'].toString();
-        _note.text = row['note'].toString();
+        id.text = row['id'].toString();
+        descrizione.text = row['descrizione'].toString();
+        anno.text = row['anno'].toString();
+        note.text = row['note'].toString();
       }
       closeConnection();
     }
@@ -152,11 +147,11 @@ class _PageState extends State<CategoriePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                createSizedEditText('DESCRIZIONE', _descrizione, 400),
-                createSizedEditText('ANNO', _anno, 160),
+                createSizedEditText('DESCRIZIONE', descrizione, 400),
+                createSizedEditText('ANNO', anno, 160),
               ],
             ),
-            createSizedEditText('NOTE', _note, 560),
+            createSizedEditText('NOTE', note, 560),
           ],
         ),
         actions: <Widget>[
@@ -165,13 +160,13 @@ class _PageState extends State<CategoriePage> {
             child: const Text('OK'),
             onPressed: () {
               var sql = '';
-              if (_id.text == '-1') {
+              if (id.text == '-1') {
                 sql = sqlInsert;
               } else {
-                sql = sqlEdit + _id.text;
+                sql = sqlEdit + id.text;
               }
               openConnection();
-              db.execute(sql, [_descrizione.text, _anno.text, _note.text]);
+              db.execute(sql, [descrizione.text, anno.text, note.text]);
               closeConnection();
               Navigator.pushNamedAndRemoveUntil(
                   context, routeBase, (route) => false);
@@ -194,7 +189,7 @@ class _PageState extends State<CategoriePage> {
       builder: (BuildContext context) => AlertDialog(
         backgroundColor: Colors.redAccent,
         title: const Text('CONFERMA LA CANCELLAZIONE'),
-        content: Text('Cancello il record ' + id + ' ' + nome + ' ?'),
+        content: Text('Cancello il record $id   -$nome ?'),
         actions: <Widget>[
           ElevatedButton(
             onPressed: () => deleteOk(id),
@@ -225,7 +220,7 @@ class _PageState extends State<CategoriePage> {
       appBar: AppBar(
         title: Row(
           children: [
-            Text(widget.title + ' '),
+            Text(widget.title),
             IconButton(
               icon: const Icon(Icons.add),
               tooltip: 'NUOVA',
