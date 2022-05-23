@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uispdokarate/constants.dart';
 import 'package:uispdokarate/drawer.dart';
 import 'package:uispdokarate/global.dart';
 import 'package:sqlite3/sqlite3.dart' as sql;
@@ -11,169 +12,175 @@ class Categorie2Page extends StatefulWidget {
 }
 
 class _PageState extends State<Categorie2Page> {
-  //String sqlBrowse = 'SELECT * FROM categorie2 LEFT JOIN categorie ON categorie2.idcategoria=categorie.id';
-  String sqlBrowse = 'SELECT * FROM categorie2';
+  String sqlBrowse =
+      'SELECT a.id,a.descrizione,a.anno1,a.anno2,a.kata,a.kumite,a.pesoiniziale,a.pesofinale,b.descrizione as cinturada,c.descrizione as cinturaa,a.sesso FROM categorie2 as a left join cinture as b on a.cinturada=b.id left join cinture as c on a.cinturaa=c.id';
   String sqlDelete = 'DELETE FROM categorie2 WHERE id=?';
   String sqlInsert =
-      'INSERT INTO CATEGORIE2 (DESCRIZIONE,ANNO,NOTE) VALUES(?,?,?)';
-  String sqlEdit = 'UPDATE CATEGORIE2 SET DESCRIZIONE=?,ANNO=?,NOTE=? WHERE ID=';
-
-
-CREATE TABLE categorie2 (
-    id           INTEGER NOT NULL
-                         PRIMARY KEY,
-    idcategoria  INTEGER NOT NULL,
-    descrizione  TEXT    NOT NULL,
-    anno1        INTEGER NOT NULL,
-    anno2        INTEGER NOT NULL,
-    kata         INTEGER NOT NULL,
-    kumite       INTEGER NOT NULL,
-    pesoiniziale INTEGER NOT NULL,
-    pesofinale   INTEGER NOT NULL,
-    cinturada    INTEGER NOT NULL,
-    cinturaa     INTEGER NOT NULL,
-    sesso        TEXT    NOT NULL,
-    note         TEXT    NOT NULL
-);
-
-
-
+      'INSERT INTO CATEGORIE2 (idcategoria,descrizione,anno1,anno2,kata,kumite,pesoiniziale,pesofinale,cinturada,cinturaa,sesso,note) VALUES(?,?,?,?,?,?,?,?,?,?,?,?);';
+  String sqlEdit =
+      'UPDATE CATEGORIE2 SET idcategoria=?,descrizione=?,anno1=?,anno2=?,kata=?,kumite=?,pesoiniziale=?,pesofinale=?,cinturada=?,cinturaa=?,sesso=?,note=?, WHERE ID=';
 
   String routeBase = '/categorie2';
-//  List<String> browseFields = ['id', 'descrizione', 'anno', 'note'];
-//  List<int> browseFieldsSize = [100, 100, 100, 100, 100];
-//  List<String> browseCaption = ['ID', 'DESCRIZIONE', 'ANNO', 'NOTE'];
-  List<String> browseDelete = ['descrizione', 'anno', 'note'];
+  List<String> browseFields = [
+    'id',
+    'descrizione',
+    'anno1',
+    'anno2',
+    'kata',
+    'kumite',
+    'pesoiniziale',
+    'pesofinale',
+    'cinturada',
+    'cinturaa',
+    'sesso',
+//    'note',
+  ];
+/*
+  List<int> browseFieldsSize = [
+    50,
+    50,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+  ];
+*/
+  List<String> browseCaption = [
+    'ID',
+    'DESCRIZIONE',
+    'DAL',
+    'AL',
+    'KATA',
+    'KUMITE',
+    'KG da',
+    'KG a',
+    'CINTURA DA',
+    'CINTURA A',
+    'SESSO',
+//    'NOTE',
+  ];
+  List<bool> browseNumeric = [
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+//    false,
+  ];
+  List<String> browseDelete = ['descrizione', 'note'];
   //int selectedIndex = 2;
+  final ScrollController horizontalScroll = ScrollController();
+  final ScrollController verticalScroll = ScrollController();
+  final double verticalWidth = 20;
+  final double horizontalWidth = 20;
 
   @override
   void initState() {
     super.initState();
   }
 
-  List<Widget> getDataLists() {
-    List<Widget> rows = [];
+  List<DataColumn> getDataColumns() {
+    List<DataColumn> columns = [];
+
+    columns.add(const DataColumn(label: Text('')));
+    columns.add(const DataColumn(label: Text('')));
+
+    for (var i = 0; i < browseCaption.length; i++) {
+      columns.add(
+          DataColumn(label: Text(browseCaption[i]), numeric: browseNumeric[i]));
+    }
+    return columns;
+  }
+
+  List<DataRow> getDataRows() {
+    List<DataRow> rows = [];
     rows.clear();
     openConnection();
     final sql.ResultSet res = db.select(sqlBrowse);
-
-
-    Card t = Card(
-        elevation: 8.0,
-        margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
-        child: Container(
-          decoration:
-              const BoxDecoration(color: Color.fromRGBO(64, 75, 96, .9)),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('REGOLE: '+categorie2title,style: TextStyle(fontSize: 20,color: Colors.green),),
-          ),
-        ),
-      );
-
-      rows.add(t);
-
-
-    // Ciclo che carica i dati nella lista
+    var i = 0;
     for (final sql.Row row in res) {
-      // ss contiene la scritta per il delete
+//      print(row);
       String ss = '';
       for (String sss in browseDelete) {
-        ss = ss + row[sss].toString() + ' ';
+        ss = '$ss ${row[sss].toString()} ';
       }
 
-      ListTile l = ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
-        leading: SizedBox(
-          width: 80,
-          child: Row(
-            children: [
-              IconButton(
-                  //padding: EdgeInsets.all(8),
-                  icon: const Icon(Icons.edit),
-                  color: Colors.green,
-                  onPressed: () => {edit(row['id'].toString())}),
-              IconButton(
-                  //padding: EdgeInsets.all(8),
-                  icon: const Icon(Icons.delete),
-                  color: Colors.red,
-                  onPressed: () => {delete(row['id'].toString(), ss)}),
-            ],
+      DataRow r = DataRow(
+        color: MaterialStateProperty.resolveWith<Color?>(
+            (Set<MaterialState> states) {
+          i++;
+          if (i.isEven) {
+            return Colors.grey.withOpacity(0.3);
+          }
+          return null; // Use default value for other states and odd rows.
+        }),
+        cells: <DataCell>[
+          DataCell(
+            IconButton(
+                icon: const Icon(Icons.edit),
+                color: tableButtonColor,
+                onPressed: () => {edit(row['id'].toString())}),
           ),
-        ),
-        title: Text(
-          'ID:   ' +
-              row['id'].toString() +
-              '     Descrizione:  ' +
-              row['descrizione'].toString(),
-          style:
-              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
-
-        subtitle: Row(
-          children: <Widget>[
-            //Icon(Icons.delete, color: Colors.yellowAccent),
-            Text(
-                'Anno:   ' +
-                    row['anno'].toString() +
-                    '     Note:   ' +
-                    row['note'].toString(),
-                style: const TextStyle(color: Colors.white))
-          ],
-        ),
-        trailing: IconButton(
-            //padding: EdgeInsets.all(8),
-            icon: const Icon(Icons.keyboard_arrow_right),
-            color: Colors.green,
-            onPressed: () {
-              categorie2id = row['id'].toString();
-              print(categorie2id);
-//              Navigator.pushNamedAndRemoveUntil(
-//                  context, 'categorie2', (route) => false);
-            }),
+          DataCell(
+            IconButton(
+                icon: const Icon(Icons.delete),
+                color: tableButtonDeleteColor,
+                onPressed: () => {delete(row['id'].toString(), ss)}),
+          ),
+        ],
       );
-
-      Card c = Card(
-        elevation: 8.0,
-        margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
-        child: Container(
-          decoration:
-              const BoxDecoration(color: Color.fromRGBO(64, 75, 96, .9)),
-          child: l,
-        ),
-      );
-
-      rows.add(c);
+      for (String s in browseFields) {
+        r.cells.add(DataCell(Text(row[s].toString())));
+      }
+      rows.add(r);
     }
     closeConnection();
     return rows;
   }
 
   void edit(String id) {
-    final TextEditingController _id = TextEditingController();
-    final TextEditingController _descrizione = TextEditingController();
-    final TextEditingController _anno = TextEditingController();
-    final TextEditingController _note = TextEditingController();
+    final TextEditingController idc = TextEditingController();
+    final TextEditingController descrizione = TextEditingController();
+    final TextEditingController anno = TextEditingController();
+    final TextEditingController note = TextEditingController();
 
     var titolo = 'Errore nel recupero dei dati';
     if (id == '-1') {
       titolo = 'Nuova categoria';
-      _id.text = '-1';
-      _descrizione.text = '';
-      _anno.text = '';
-      _note.text = '';
+      idc.text = '-1';
+      descrizione.text = '';
+      anno.text = '';
+      note.text = '';
     } else {
       titolo = 'Modifica Categoria';
       openConnection();
       final sql.ResultSet res =
           db.select('SELECT * FROM CATEGORIE WHERE ID= ?', [id]);
       for (final sql.Row row in res) {
-        _id.text = row['id'].toString();
-        _descrizione.text = row['descrizione'].toString();
-        _anno.text = row['anno'].toString();
-        _note.text = row['note'].toString();
+        idc.text = row['id'].toString();
+        descrizione.text = row['descrizione'].toString();
+        anno.text = row['anno'].toString();
+        note.text = row['note'].toString();
       }
       closeConnection();
     }
@@ -190,11 +197,11 @@ CREATE TABLE categorie2 (
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                createSizedEditText('DESCRIZIONE', _descrizione, 400),
-                createSizedEditText('ANNO', _anno, 160),
+                createSizedEditText('DESCRIZIONE', descrizione, 400),
+                createSizedEditText('ANNO', anno, 160),
               ],
             ),
-            createSizedEditText('NOTE', _note, 560),
+            createSizedEditText('NOTE', note, 560),
           ],
         ),
         actions: <Widget>[
@@ -203,13 +210,13 @@ CREATE TABLE categorie2 (
             child: const Text('OK'),
             onPressed: () {
               var sql = '';
-              if (_id.text == '-1') {
+              if (idc.text == '-1') {
                 sql = sqlInsert;
               } else {
-                sql = sqlEdit + _id.text;
+                sql = sqlEdit + idc.text;
               }
               openConnection();
-              db.execute(sql, [_descrizione.text, _anno.text, _note.text]);
+              db.execute(sql, [descrizione.text, anno.text, note.text]);
               closeConnection();
               Navigator.pushNamedAndRemoveUntil(
                   context, routeBase, (route) => false);
@@ -232,7 +239,7 @@ CREATE TABLE categorie2 (
       builder: (BuildContext context) => AlertDialog(
         backgroundColor: Colors.redAccent,
         title: const Text('CONFERMA LA CANCELLAZIONE'),
-        content: Text('Cancello il record ' + id + ' ' + nome + ' ?'),
+        content: Text('Cancello il record $id - $nome ?'),
         actions: <Widget>[
           ElevatedButton(
             onPressed: () => deleteOk(id),
@@ -263,7 +270,7 @@ CREATE TABLE categorie2 (
       appBar: AppBar(
         title: Row(
           children: [
-            Text(widget.title + ' '),
+            Text(widget.title),
             IconButton(
               icon: const Icon(Icons.add),
               tooltip: 'NUOVA',
@@ -299,17 +306,46 @@ CREATE TABLE categorie2 (
                 // flex: 1, (default)
                 child: NavigationDrawer(),
               ),
-
+/*
             Expanded(
               flex: 5,
-//              child: SingleChildScrollView(
-//                padding: const EdgeInsets.all(defaultPadding),
-              child: ListView(
-                    children: getDataLists(),
-                  ),
-              
+              child: InteractiveViewer(
+                constrained: false,
+                child: DataTable(
+                  rows: getDataRows(),
+                  columns: getDataColumns(),
+                ),
               ),
-//            ),
+            ),
+*/
+            Expanded(
+              flex: 5,
+              child: Scrollbar(
+                controller: verticalScroll,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  controller: verticalScroll,
+                  child: Scrollbar(
+                    scrollbarOrientation: ScrollbarOrientation.bottom,
+                    thumbVisibility: true,
+                    controller: horizontalScroll,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      controller: horizontalScroll,
+                      child: DataTable(
+                        columnSpacing: 8,
+                        dataRowHeight: 40,
+                        headingRowHeight: 40,
+//                        headingRowColor: Colors.red,
+                        rows: getDataRows(),
+                        columns: getDataColumns(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

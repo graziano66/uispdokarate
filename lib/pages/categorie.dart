@@ -125,7 +125,7 @@ class _PageState extends State<CategoriePage> {
       titolo = 'Modifica Categoria';
       openConnection();
       final sql.ResultSet res =
-          db.select('SELECT * FROM CATEGORIE WHERE ID= ?', [id]);
+          db.select('SELECT * FROM CATEGORIE WHERE ID= ?', [ids]);
       for (final sql.Row row in res) {
         id.text = row['id'].toString();
         descrizione.text = row['descrizione'].toString();

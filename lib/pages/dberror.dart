@@ -28,7 +28,7 @@ class _DbErrorPageState extends State<DbErrorPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             //crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(dbError.toString() + '-' + dbErrorString),
+              Text('${dbError.toString()} - $dbErrorString'),
               const SizedBox(
                 height: 10,
               ),

@@ -32,14 +32,6 @@ class NavigationDrawer extends StatelessWidget {
               height: 8,
             ),
             drawerMenuItem(
-              text: 'BROWSE',
-              icon: Icons.people,
-              onClicked: () => selectedItem(context, 2),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            drawerMenuItem(
               text: 'Cinture',
               icon: Icons.edit,
               onClicked: () => selectedItem(context, 3),
@@ -51,14 +43,6 @@ class NavigationDrawer extends StatelessWidget {
               text: 'Gare',
               icon: Icons.edit,
               onClicked: () => selectedItem(context, 4),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            drawerMenuItem(
-              text: 'Gare2',
-              icon: Icons.edit,
-              onClicked: () => selectedItem(context, 5),
             ),
             const SizedBox(
               height: 8,
@@ -104,12 +88,6 @@ void selectedItem(BuildContext context, int index) {
       Navigator.pushNamedAndRemoveUntil(
           context, '/categorie', (route) => false);
       break;
-
-    case 2:
-//      print('BROWSE');
-      Navigator.pushNamedAndRemoveUntil(context, '/browse', (route) => false);
-      break;
-
     case 3:
       Navigator.pushNamedAndRemoveUntil(context, '/cinture', (route) => false);
       break;
